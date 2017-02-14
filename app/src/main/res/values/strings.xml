@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Popular Movies App</string>
+    <string name="error">There is an error here...</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_popular">Popular</string>
+    <string name="menu_top_rated">Top rated</string>
+    <string name="no_connection">No connection...</string>
+    <string name="detail_overview">Overview : \n</string>
+    <string name="detail_vote_average">Vote Average : </string>
+    <string name="detail_release_date">Release Date : </string>
+</resources>
