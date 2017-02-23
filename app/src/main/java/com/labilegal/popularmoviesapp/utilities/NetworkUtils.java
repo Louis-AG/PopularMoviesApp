@@ -35,7 +35,6 @@ public class NetworkUtils {
             "https://image.tmdb.org/t/p/";
 
     // Paramètre
-    private static final String PATH_DISCOVER = "discover";
     private static final String PATH_MOVIE = "movie";
     private static final String PATH_TOP_RATED = "top_rated";
     private static final String PATH_POPULAR = "popular";
@@ -51,30 +50,6 @@ public class NetworkUtils {
     private static final String VALEUR_FR = "fr";
     private static final String VALEUR_PAGE_3 = "3";
 
-    // Url de base
-    //private static final String STATIC_USE_BASE_URL = STATIC_HTTPS_BASE_URL + PARAMETRE_DISCOVER_VIDEO;
-
-    /*
-    Build the Url to show the discover movies on home (discover movie fr page 3)
-    */
-    public static URL buildUrlDiscoverMovieFr() {
-        Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_URL).buildUpon()
-                .appendPath(PATH_DISCOVER)
-                .appendPath(PATH_MOVIE)
-                .appendQueryParameter(SUP_PARAMETRE_LANGUAGE, VALEUR_FR)
-                .appendQueryParameter(SUP_PARAMETRE_PAGE, VALEUR_PAGE_3)
-                .appendQueryParameter(SUP_PARAMETRE_API_KEY, STATIC_API_KEY)
-                .build();
-
-        URL url = null;
-        try {
-            url = new URL(builtUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        Log.v(TAG, "Built buildUrlDiscoverFr : " + url);
-        return url;
-    }
     /*
     Build the Url to show most popular movies
     */
@@ -94,6 +69,25 @@ public class NetworkUtils {
         Log.v(TAG, "Built buildUrlDiscoverMovieSortByMostPopular : " + url);
         return url;
     }
+
+    public static URL buildUrlDiscoverMovieSortByMostPopularOtherPage(int pageIndex) {
+        Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_URL).buildUpon()
+                .appendPath(PATH_MOVIE)
+                .appendPath(PATH_POPULAR)
+                .appendQueryParameter(SUP_PARAMETRE_PAGE, String.valueOf(pageIndex))
+                .appendQueryParameter(SUP_PARAMETRE_API_KEY, STATIC_API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        Log.v(TAG, "Built buildUrlDiscoverMovieSortByMostPopularOtherPage : " + url);
+        return url;
+    }
+
     /*
     Build the Url to show top rated movies
     */
@@ -114,11 +108,12 @@ public class NetworkUtils {
         return url;
     }
 
-    /*
-    Build the Url to get image
-    */
-    public static URL buildUrlGetImage(String path, String size) {
-        Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_IMAGE_URL + size + path).buildUpon()
+    public static URL buildUrlDiscoverMovieSortByTopRatedOtherPage(int pageIndex) {
+        Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_URL).buildUpon()
+                .appendPath(PATH_MOVIE)
+                .appendPath(PATH_TOP_RATED)
+                .appendQueryParameter(SUP_PARAMETRE_PAGE, String.valueOf(pageIndex))
+                .appendQueryParameter(SUP_PARAMETRE_API_KEY, STATIC_API_KEY)
                 .build();
 
         URL url = null;
@@ -127,10 +122,13 @@ public class NetworkUtils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        Log.v(TAG, "Built buildUrlGetImage : " + url);
+        Log.v(TAG, "Built buildUrlDiscoverMovieSortByTopRatedOtherPage : " + url);
         return url;
     }
 
+    /*
+    Build the Url to get image
+    */
     public static URL buildUrlGetImageW185(String path) {
         Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_IMAGE_URL + VALEUR_SIZE_W185 + path).buildUpon()
                 .build();
@@ -182,7 +180,8 @@ public class NetworkUtils {
         if (displayMetrics.densityDpi < DisplayMetrics.DENSITY_XHIGH ) {
             url = NetworkUtils.buildUrlGetImageW185(movie.getPosterPath());
 
-        } else if ((DisplayMetrics.DENSITY_XHIGH <= displayMetrics.densityDpi) && (displayMetrics.densityDpi < DisplayMetrics.DENSITY_XXHIGH )) {
+        } else if ((DisplayMetrics.DENSITY_XHIGH <= displayMetrics.densityDpi)
+                && (displayMetrics.densityDpi < DisplayMetrics.DENSITY_XXHIGH )) {
             url = NetworkUtils.buildUrlGetImageW500(movie.getPosterPath());
 
         } else if (DisplayMetrics.DENSITY_XXHIGH < displayMetrics.densityDpi) {

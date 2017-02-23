@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements MoviesWithClassAd
         if (savedInstanceState != null) {
             myChoice = savedInstanceState.getString(STRING_FOR_ON_SAVE_MY_CHOICE);
         } else {
-            myChoice = getString(R.string.discover_movie_fr);
+            myChoice = getString(R.string.sort_by_most_popular);
         }
         displayMoviesData();
     }
@@ -100,9 +100,7 @@ public class MainActivity extends AppCompatActivity implements MoviesWithClassAd
             getSupportLoaderManager().restartLoader(DISCOVER_MOVIE_SEARCH_LOADER, null, this).forceLoad();
 
             switch (myChoice) {
-                case "DiscoverMovieFr":
-                    getSupportActionBar().setTitle(getString(R.string.menu_home));
-                    break;
+
                 case "SortByMostPopular":
                     getSupportActionBar().setTitle(getString(R.string.menu_popular));
                     break;
@@ -179,11 +177,6 @@ public class MainActivity extends AppCompatActivity implements MoviesWithClassAd
 
         switch (item.getItemId()) {
             // Handle item selection
-            case R.id.menu_home:
-                mMoviesAdapter.setmMoviesData(null);
-                myChoice = getString(R.string.discover_movie_fr);
-                displayMoviesData();
-                return true;
 
             case R.id.menu_sort_popular:
                 mMoviesAdapter.setmMoviesData(null);
@@ -235,9 +228,6 @@ public class MainActivity extends AppCompatActivity implements MoviesWithClassAd
                 URL tUrl;
                 Log.v(TAG, " we are in loadInBackground " + myChoice);
                 switch (myChoice) {
-                    case "DiscoverMovieFr":
-                        tUrl = NetworkUtils.buildUrlDiscoverMovieFr();
-                        break;
                     case "SortByMostPopular":
                         tUrl = NetworkUtils.buildUrlDiscoverMovieSortByMostPopular();
                         break;
@@ -274,7 +264,6 @@ public class MainActivity extends AppCompatActivity implements MoviesWithClassAd
             showJsonDataView();
             // Give Data To Adapter
             mMoviesAdapter.setmMoviesData(data);
-            //mMoviesAdapter.notifyDataSetChanged();
             mRecyclerViewMovies.setAdapter(mMoviesAdapter);
         } else {
             showErrorMessage();
