@@ -2,11 +2,14 @@ package com.labilegal.popularmoviesapp.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.labilegal.popularmoviesapp.MainActivity;
 import com.labilegal.popularmoviesapp.R;
 import com.labilegal.popularmoviesapp.data.Movie;
 import com.labilegal.popularmoviesapp.utilities.NetworkUtils;
@@ -26,8 +29,12 @@ public class MoviesWithClassAdapter extends RecyclerView.Adapter<MoviesWithClass
 
     private final MoviesWithClassAdapterOnclickHandler mClickHandler;
 
-    public MoviesWithClassAdapter(MoviesWithClassAdapterOnclickHandler clickHandler) {
+
+    private Context mContext;
+
+    public MoviesWithClassAdapter(MoviesWithClassAdapterOnclickHandler clickHandler, Context context) {
         this.mClickHandler = clickHandler;
+        this.mContext = context;
     }
 
     /*
@@ -51,7 +58,7 @@ public class MoviesWithClassAdapter extends RecyclerView.Adapter<MoviesWithClass
     @Override
     public void onBindViewHolder(MoviesWithClassViewHolder holder, int position) {
         Movie movie = mMoviesData[position];
-        URL url = NetworkUtils.buildUrlGetImageW500(movie.getPosterPath());
+        URL url = NetworkUtils.choseSizeToLoad(movie, mContext);
         Context context = holder.mImageViewMovieItem.getContext();
         Picasso.with(context)
                 .load(url.toString())
@@ -62,9 +69,9 @@ public class MoviesWithClassAdapter extends RecyclerView.Adapter<MoviesWithClass
 
     @Override
     public int getItemCount() {
-        if(mMoviesData == null){
+        if (mMoviesData == null) {
             return 0;
-        }else {
+        } else {
             return mMoviesData.length;
         }
     }
@@ -74,7 +81,7 @@ public class MoviesWithClassAdapter extends RecyclerView.Adapter<MoviesWithClass
         notifyDataSetChanged();
     }
 
-    public class MoviesWithClassViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class MoviesWithClassViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView mImageViewMovieItem;
 

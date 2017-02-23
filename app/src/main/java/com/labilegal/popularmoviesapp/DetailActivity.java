@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.labilegal.popularmoviesapp.adapter.MoviesWithClassAdapter;
 import com.labilegal.popularmoviesapp.data.Movie;
 import com.labilegal.popularmoviesapp.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
@@ -29,13 +30,15 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Movie movie = getIntent().getExtras().getParcelable("movie");
 
         ButterKnife.bind(this);
 
         mTextViewDetailTitle.setText(movie.getOriginalTitle());
         Picasso.with(this)
-                .load(String.valueOf(NetworkUtils.buildUrlGetImageW500(movie.getPosterPath())))
+                .load(String.valueOf(NetworkUtils.choseSizeToLoad(movie, this)))
                 .into(mImageViewDetailMovieImg);
         mTextViewOverview.append(movie.getOverview());
         mTextViewVoteAverage.append(String.valueOf(movie.getVoteAverage()));

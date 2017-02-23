@@ -4,21 +4,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.labilegal.popularmoviesapp.adapter.MoviesWithClassAdapter;
 import com.labilegal.popularmoviesapp.data.Movie;
-import com.labilegal.popularmoviesapp.utilities.FetchMoviesDataTask;
 import com.labilegal.popularmoviesapp.utilities.NetworkUtils;
 import com.labilegal.popularmoviesapp.utilities.OpenDataJsonUtils;
 
@@ -31,17 +33,26 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class MainActivity extends AppCompatActivity implements MoviesWithClassAdapter.MoviesWithClassAdapterOnclickHandler {
+public class MainActivity extends AppCompatActivity implements MoviesWithClassAdapter.MoviesWithClassAdapterOnclickHandler,
+        LoaderManager.LoaderCallbacks<Movie[]> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final int DISCOVER_MOVIE_SEARCH_LOADER = 22;
+
+    private static final String STRING_FOR_ON_SAVE_MY_CHOICE = "mychoicesave";
+    private String myChoice;
+
     private MoviesWithClassAdapter mMoviesAdapter;
 
-    @BindView(R.id.tv_indication) TextView mTextViewIndication;
-    @BindView(R.id.tv_no_connection_message_display) TextView mTextViewNoConnection;
-    @BindView(R.id.tv_error_message_display) TextView mTextViewErrorMessage;
-    @BindView(R.id.pb_loading_indicator) ProgressBar mProgresBar;
-    @BindView(R.id.rv_movies) RecyclerView mRecyclerViewMovies;
+    @BindView(R.id.tv_no_connection_message_display)
+    TextView mTextViewNoConnection;
+    @BindView(R.id.tv_error_message_display)
+    TextView mTextViewErrorMessage;
+    @BindView(R.id.pb_loading_indicator)
+    ProgressBar mProgresBar;
+    @BindView(R.id.rv_movies)
+    RecyclerView mRecyclerViewMovies;
 
 
     @Override
@@ -52,14 +63,29 @@ public class MainActivity extends AppCompatActivity implements MoviesWithClassAd
         ButterKnife.bind(this);
 
         //LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, calculateNoOfColumns(this));
 
-        mRecyclerViewMovies.setLayoutManager(layoutManager);
+        mRecyclerViewMovies.setLayoutManager(gridLayoutManager);
         mRecyclerViewMovies.setHasFixedSize(false);
-        mMoviesAdapter = new MoviesWithClassAdapter(this);
+        mMoviesAdapter = new MoviesWithClassAdapter(this, this);
         mRecyclerViewMovies.setAdapter(mMoviesAdapter);
 
+        if (savedInstanceState != null) {
+            myChoice = savedInstanceState.getString(STRING_FOR_ON_SAVE_MY_CHOICE);
+        } else {
+            myChoice = getString(R.string.discover_movie_fr);
+        }
         displayMoviesData();
+    }
+
+    /*
+    Function view with the link on "http://stackoverflow.com/questions/33575731/gridlayoutmanager-how-to-auto-fit-columns"
+     */
+    public static int calculateNoOfColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.densityDpi;
+        int noOfColumns = (int) Math.max(1, dpWidth);
+        return noOfColumns;
     }
 
     /*
@@ -68,31 +94,23 @@ public class MainActivity extends AppCompatActivity implements MoviesWithClassAd
     private void displayMoviesData() {
         if (isOnline()) {
             hideNoConnection();
-            URL url = NetworkUtils.buildUrlDiscoverMovieFr();
-            new FetchMoviesDataTask(mRecyclerViewMovies,mMoviesAdapter, mTextViewErrorMessage,mProgresBar).execute(url);
-            mTextViewIndication.setText("Home");
-        } else {
-            showNoConnection();
-        }
-    }
 
-    private void displayMoviesDataSortByMostPopular() {
-        if (isOnline()) {
-            hideNoConnection();
-            URL url = NetworkUtils.buildUrlDiscoverMovieSortByMostPopular();
-            new FetchMoviesDataTask(mRecyclerViewMovies, mMoviesAdapter, mTextViewErrorMessage, mProgresBar).execute(url);
-            mTextViewIndication.setText("Sort by Most Popular");
-        } else {
-            showNoConnection();
-        }
-    }
+            getSupportLoaderManager().restartLoader(DISCOVER_MOVIE_SEARCH_LOADER, null, this).forceLoad();
 
-    private void displayMoviesDataSortByTopRated() {
-        if (isOnline()) {
-            hideNoConnection();
-            URL url = NetworkUtils.buildUrlDiscoverMovieSortByTopRated();
-            new FetchMoviesDataTask(mRecyclerViewMovies, mMoviesAdapter, mTextViewErrorMessage, mProgresBar).execute(url);
-            mTextViewIndication.setText("Sort by Top Rated");
+            switch (myChoice) {
+                case "DiscoverMovieFr":
+                    getSupportActionBar().setTitle(getString(R.string.menu_home));
+                    break;
+                case "SortByMostPopular":
+                    getSupportActionBar().setTitle(getString(R.string.menu_popular));
+                    break;
+                case "SortByTopRated":
+                    getSupportActionBar().setTitle(getString(R.string.menu_top_rated));
+                    break;
+                default:
+                    getSupportActionBar().setTitle(getString(R.string.app_name));
+                    break;
+            }
         } else {
             showNoConnection();
         }
@@ -161,21 +179,125 @@ public class MainActivity extends AppCompatActivity implements MoviesWithClassAd
             // Handle item selection
             case R.id.menu_home:
                 mMoviesAdapter.setmMoviesData(null);
+                myChoice = getString(R.string.discover_movie_fr);
                 displayMoviesData();
                 return true;
 
             case R.id.menu_sort_popular:
                 mMoviesAdapter.setmMoviesData(null);
-                displayMoviesDataSortByMostPopular();
+                myChoice = getString(R.string.sort_by_most_popular);
+                displayMoviesData();
                 return true;
 
             case R.id.menu_sort_top_rated:
                 mMoviesAdapter.setmMoviesData(null);
-                displayMoviesDataSortByTopRated();
+                myChoice = getString(R.string.sort_by_top_rated);
+                displayMoviesData();
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STRING_FOR_ON_SAVE_MY_CHOICE, myChoice);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        myChoice = savedInstanceState.getString(STRING_FOR_ON_SAVE_MY_CHOICE);
+    }
+
+    /*
+    Loader for movies infos
+    */
+    @Override
+    public Loader<Movie[]> onCreateLoader(int id, final Bundle args) {
+        return new AsyncTaskLoader<Movie[]>(this) {
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                if (args == null) {
+                    return;
+                }
+                mProgresBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public Movie[] loadInBackground() {
+                URL tUrl;
+                Log.v(TAG, " we are in loadInBackground " + myChoice);
+                switch (myChoice) {
+                    case "DiscoverMovieFr":
+                        tUrl = NetworkUtils.buildUrlDiscoverMovieFr();
+                        break;
+                    case "SortByMostPopular":
+                        tUrl = NetworkUtils.buildUrlDiscoverMovieSortByMostPopular();
+                        break;
+                    case "SortByTopRated":
+                        tUrl = NetworkUtils.buildUrlDiscoverMovieSortByTopRated();
+                        break;
+                    default:
+                        return null;
+                }
+
+                Movie[] tResultsWithMovieClass = null;
+
+                try {
+                    String jsonResults = NetworkUtils.getResponseFromHttpUrl(tUrl);
+
+                    tResultsWithMovieClass = OpenDataJsonUtils.getSimpleDataMoviesFromJsonWithMovieClass(jsonResults);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                return tResultsWithMovieClass;
+            }
+
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Movie[]> loader, Movie[] data) {
+        mProgresBar.setVisibility(View.INVISIBLE);
+        if (data != null) {
+            showJsonDataView();
+            // Give Data To Adapter
+            mMoviesAdapter.setmMoviesData(data);
+            //mMoviesAdapter.notifyDataSetChanged();
+            mRecyclerViewMovies.setAdapter(mMoviesAdapter);
+        } else {
+            showErrorMessage();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Movie[]> loader) {
+    }
+
+    /*
+  Display functions
+   */
+    private void showJsonDataView() {
+        mTextViewErrorMessage.setVisibility(View.INVISIBLE);
+        mRecyclerViewMovies.setVisibility(View.VISIBLE);
+    }
+
+    private void showErrorMessage() {
+        mRecyclerViewMovies.setVisibility(View.INVISIBLE);
+        mTextViewErrorMessage.setVisibility(View.VISIBLE);
+    }
+
+    /*
+    class movie list
+
+     */
 }

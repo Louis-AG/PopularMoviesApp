@@ -1,7 +1,11 @@
 package com.labilegal.popularmoviesapp.utilities;
 
+import android.content.Context;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.util.Log;
+
+import com.labilegal.popularmoviesapp.data.Movie;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +47,7 @@ public class NetworkUtils {
     // Valeur
     private static final String VALEUR_SIZE_W185 = "w185";
     private static final String VALEUR_SIZE_W500 = "w500";
+    private static final String VALEUR_SIZE_W780 = "w780";
     private static final String VALEUR_FR = "fr";
     private static final String VALEUR_PAGE_3 = "3";
 
@@ -150,7 +155,43 @@ public class NetworkUtils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        Log.v(TAG, "Built buildUrlGetImageW185 : " + url);
+        Log.v(TAG, "Built buildUrlGetImageW500 : " + url);
+        return url;
+    }
+
+    public static URL buildUrlGetImageW780(String path) {
+        Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_IMAGE_URL + VALEUR_SIZE_W780 + path).buildUpon()
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        Log.v(TAG, "Built buildUrlGetImageW780 : " + url);
+        return url;
+    }
+
+    /*
+    For selecting the good size of images for the device
+     */
+    public static URL choseSizeToLoad(Movie movie, Context context) {
+        URL url;
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        if (displayMetrics.densityDpi < DisplayMetrics.DENSITY_XHIGH ) {
+            url = NetworkUtils.buildUrlGetImageW185(movie.getPosterPath());
+
+        } else if ((DisplayMetrics.DENSITY_XHIGH <= displayMetrics.densityDpi) && (displayMetrics.densityDpi < DisplayMetrics.DENSITY_XXHIGH )) {
+            url = NetworkUtils.buildUrlGetImageW500(movie.getPosterPath());
+
+        } else if (DisplayMetrics.DENSITY_XXHIGH < displayMetrics.densityDpi) {
+            url = NetworkUtils.buildUrlGetImageW780(movie.getPosterPath());
+
+        } else{
+            url = NetworkUtils.buildUrlGetImageW185(movie.getPosterPath());
+
+        }
         return url;
     }
 
