@@ -32,6 +32,8 @@ import java.net.URL;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.support.v7.recyclerview.R.styleable.RecyclerView;
+
 
 public class MainActivity extends AppCompatActivity implements MoviesWithClassAdapter.MoviesWithClassAdapterOnclickHandler,
         LoaderManager.LoaderCallbacks<Movie[]> {
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements MoviesWithClassAd
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, calculateNoOfColumns(this));
 
         mRecyclerViewMovies.setLayoutManager(gridLayoutManager);
-        mRecyclerViewMovies.setHasFixedSize(false);
+        mRecyclerViewMovies.setHasFixedSize(true);
         mMoviesAdapter = new MoviesWithClassAdapter(this, this);
         mRecyclerViewMovies.setAdapter(mMoviesAdapter);
 
