@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import com.labilegal.popularmoviesapp.MainActivity;
 import com.labilegal.popularmoviesapp.R;
 import com.labilegal.popularmoviesapp.data.Movie;
+import com.labilegal.popularmoviesapp.data.MovieList;
 import com.labilegal.popularmoviesapp.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
@@ -25,7 +26,7 @@ public class MoviesWithClassAdapter extends RecyclerView.Adapter<MoviesWithClass
 
     private static final String TAG = MoviesWithClassAdapter.class.getSimpleName();
 
-    private Movie[] mMoviesData;
+    private MovieList mMoviesData;
 
     private final MoviesWithClassAdapterOnclickHandler mClickHandler;
 
@@ -57,7 +58,7 @@ public class MoviesWithClassAdapter extends RecyclerView.Adapter<MoviesWithClass
 
     @Override
     public void onBindViewHolder(MoviesWithClassViewHolder holder, int position) {
-        Movie movie = mMoviesData[position];
+        Movie movie = mMoviesData.get(position);
         URL url = NetworkUtils.choseSizeToLoad(movie, mContext);
         Context context = holder.mImageViewMovieItem.getContext();
         Picasso.with(context)
@@ -72,12 +73,16 @@ public class MoviesWithClassAdapter extends RecyclerView.Adapter<MoviesWithClass
         if (mMoviesData == null) {
             return 0;
         } else {
-            return mMoviesData.length;
+            return mMoviesData.size();
         }
     }
 
-    public void setmMoviesData(Movie[] mMoviesData) {
-        this.mMoviesData = mMoviesData;
+    public MovieList getMovies(){
+        return mMoviesData;
+    }
+
+    public void setmMoviesData(MovieList moviesData) {
+        this.mMoviesData = moviesData;
         notifyDataSetChanged();
     }
 
@@ -94,7 +99,7 @@ public class MoviesWithClassAdapter extends RecyclerView.Adapter<MoviesWithClass
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            Movie movie = mMoviesData[adapterPosition];
+            Movie movie = mMoviesData.get(adapterPosition);
             mClickHandler.onClick(movie);
         }
     }

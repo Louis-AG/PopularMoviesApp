@@ -19,6 +19,10 @@ public class Movie implements Parcelable {
     /*
     Constructor
      */
+
+    public Movie() {
+    }
+
     public Movie(int id, String originalTitle, String posterPath, String overview, int voteAverage, String releaseDate) {
         super();
         this.mId = id;

@@ -2,10 +2,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".DetailActivity" >
+    android:orientation="horizontal"
+    tools:context=".MainActivity"
+    android:id="@+id/frags">
+
     <FrameLayout
-        android:id="@+id/detail_fragment"
+        android:id="@+id/fragment_main"
+        android:name="com.labilegal.popularmoviesapp.MainFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <FrameLayout
+        android:id="@+id/fragment_detail"
         android:name="com.labilegal.popularmoviesapp.DetailFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

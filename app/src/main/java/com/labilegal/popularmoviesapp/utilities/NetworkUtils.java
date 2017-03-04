@@ -38,21 +38,20 @@ public class NetworkUtils {
     private static final String PATH_MOVIE = "movie";
     private static final String PATH_TOP_RATED = "top_rated";
     private static final String PATH_POPULAR = "popular";
+    private static final String PATH_VIDEOS = "videos";
+    private static final String PATH_REVIEWS = "reviews";
 
     private static final String SUP_PARAMETRE_API_KEY = "api_key";
-    private static final String SUP_PARAMETRE_LANGUAGE = "language";
     private static final String SUP_PARAMETRE_PAGE = "page";
 
     // Valeur
     private static final String VALEUR_SIZE_W185 = "w185";
     private static final String VALEUR_SIZE_W500 = "w500";
     private static final String VALEUR_SIZE_W780 = "w780";
-    private static final String VALEUR_FR = "fr";
-    private static final String VALEUR_PAGE_3 = "3";
 
     /*
     Build the Url to show most popular movies
-    */
+     */
     public static URL buildUrlDiscoverMovieSortByMostPopular() {
         Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_URL).buildUpon()
                 .appendPath(PATH_MOVIE)
@@ -70,12 +69,12 @@ public class NetworkUtils {
         return url;
     }
 
-    public static URL buildUrlDiscoverMovieSortByMostPopularOtherPage(int pageIndex) {
+    public static URL buildUrlDiscoverMovieSortByMostPopularWithPage(int pageIndex) {
         Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_URL).buildUpon()
                 .appendPath(PATH_MOVIE)
                 .appendPath(PATH_POPULAR)
-                .appendQueryParameter(SUP_PARAMETRE_PAGE, String.valueOf(pageIndex))
                 .appendQueryParameter(SUP_PARAMETRE_API_KEY, STATIC_API_KEY)
+                .appendQueryParameter(SUP_PARAMETRE_PAGE, String.valueOf(pageIndex))
                 .build();
 
         URL url = null;
@@ -84,13 +83,10 @@ public class NetworkUtils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        Log.v(TAG, "Built buildUrlDiscoverMovieSortByMostPopularOtherPage : " + url);
+        Log.v(TAG, "Built buildUrlDiscoverMovieSortByMostPopularWithPage : " + url);
         return url;
     }
 
-    /*
-    Build the Url to show top rated movies
-    */
     public static URL buildUrlDiscoverMovieSortByTopRated() {
         Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_URL).buildUpon()
                 .appendPath(PATH_MOVIE)
@@ -108,11 +104,14 @@ public class NetworkUtils {
         return url;
     }
 
-    public static URL buildUrlDiscoverMovieSortByTopRatedOtherPage(int pageIndex) {
+    /*
+    Buid the url to keep trailers information
+     */
+    public static URL buildUrlKeepTrailersInformation(int id){
         Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_URL).buildUpon()
                 .appendPath(PATH_MOVIE)
-                .appendPath(PATH_TOP_RATED)
-                .appendQueryParameter(SUP_PARAMETRE_PAGE, String.valueOf(pageIndex))
+                .appendPath(String.valueOf(id))
+                .appendPath(PATH_VIDEOS)
                 .appendQueryParameter(SUP_PARAMETRE_API_KEY, STATIC_API_KEY)
                 .build();
 
@@ -122,13 +121,34 @@ public class NetworkUtils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        Log.v(TAG, "Built buildUrlDiscoverMovieSortByTopRatedOtherPage : " + url);
+        Log.v(TAG, "Built buildUrlKeepTrailersInformation : " + url);
+        return url;
+    }
+
+    /*
+    Buid the url to keep reviews information
+     */
+    public static URL buildUrlKeepReviewsInformation(int id){
+        Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_URL).buildUpon()
+                .appendPath(PATH_MOVIE)
+                .appendPath(String.valueOf(id))
+                .appendPath(PATH_REVIEWS)
+                .appendQueryParameter(SUP_PARAMETRE_API_KEY, STATIC_API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        Log.v(TAG, "Built buildUrlKeepReviewsInformation : " + url);
         return url;
     }
 
     /*
     Build the Url to get image
-    */
+     */
     public static URL buildUrlGetImageW185(String path) {
         Uri builtUri = Uri.parse(STATIC_HTTPS_BASE_IMAGE_URL + VALEUR_SIZE_W185 + path).buildUpon()
                 .build();

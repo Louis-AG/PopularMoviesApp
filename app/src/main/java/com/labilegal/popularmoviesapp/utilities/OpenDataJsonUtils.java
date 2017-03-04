@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.labilegal.popularmoviesapp.data.Movie;
+import com.labilegal.popularmoviesapp.data.MovieList;
+import com.labilegal.popularmoviesapp.data.Review;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +32,10 @@ public final class OpenDataJsonUtils {
     static final String DM_VOTE_AVERAGE = "vote_average";
     static final String DM_RELEASE_DATE = "release_date";
 
+    static final String DM_AUTHOR = "author";
+    static final String DM_CONTENT = "content";
+    static final String DM_URL = "url";
+
     /**
      * Others information
      *
@@ -45,10 +51,10 @@ public final class OpenDataJsonUtils {
      * final String DM_VIDEO = "video";
      */
 
-    public static Movie[] getSimpleDataMoviesFromJsonWithMovieClass(String stringJson) throws JSONException {
+    public static MovieList getSimpleDataMoviesFromJsonWithMovieClass(String stringJson) throws JSONException {
 
         /* String array to hold each movies String */
-        Movie[] parsedDataMovies = null;
+        MovieList parsedDataMovies = null;
 
         JSONObject forecastJson = new JSONObject(stringJson);
 
@@ -69,7 +75,7 @@ public final class OpenDataJsonUtils {
         }
 
         JSONArray resultsArray = forecastJson.getJSONArray(DM_RESULTS);
-        parsedDataMovies = new Movie[resultsArray.length()];
+        parsedDataMovies = new MovieList();//resultsArray.length()
 
 
         for (int i = 0; i < resultsArray.length(); i++){
@@ -82,10 +88,91 @@ public final class OpenDataJsonUtils {
                     , movieForecast.getInt(DM_VOTE_AVERAGE)
                     , movieForecast.getString(DM_RELEASE_DATE));
 
-            parsedDataMovies[i] = movie;
+            parsedDataMovies.add(movie);
 
         }
 
         return parsedDataMovies;
+    }
+
+    public static String[] getSimpleDataStringFromJson(String stringJson) throws JSONException {
+
+        /* String array to hold each movies String */
+        String[] parsedDataString = null;
+
+        JSONObject forecastJson = new JSONObject(stringJson);
+
+        /* Is there an error? */
+        if (forecastJson.has(DM_MESSAGE_CODE)) {
+            int errorCode = forecastJson.getInt(DM_MESSAGE_CODE);
+
+            switch (errorCode) {
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    /* Location invalid */
+                    return null;
+                default:
+                    /* Server probably down */
+                    return null;
+            }
+        }
+
+        JSONArray resultsArray = forecastJson.getJSONArray(DM_RESULTS);
+        parsedDataString = new String[resultsArray.length()];
+
+
+        for (int i = 0; i < resultsArray.length(); i++){
+            JSONObject trailerForecast = resultsArray.getJSONObject(i);
+
+            String string = trailerForecast.getString("key");
+            Log.v(TAG, "String : " + string);
+
+            parsedDataString[i] = string;
+
+        }
+
+        return parsedDataString;
+    }
+
+    public static Review[] getSimpleDataReviewsFromJson(String stringJson) throws JSONException {
+
+        /* String array to hold each movies String */
+        Review[] parsedDataReviews = null;
+
+        JSONObject forecastJson = new JSONObject(stringJson);
+
+        /* Is there an error? */
+        if (forecastJson.has(DM_MESSAGE_CODE)) {
+            int errorCode = forecastJson.getInt(DM_MESSAGE_CODE);
+
+            switch (errorCode) {
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    /* Location invalid */
+                    return null;
+                default:
+                    /* Server probably down */
+                    return null;
+            }
+        }
+
+        JSONArray resultsArray = forecastJson.getJSONArray(DM_RESULTS);
+        parsedDataReviews = new Review[resultsArray.length()];
+
+
+        for (int i = 0; i < resultsArray.length(); i++){
+            JSONObject reviewForecast = resultsArray.getJSONObject(i);
+
+            Review review = new Review(reviewForecast.getString(DM_ID)
+                    , reviewForecast.getString(DM_AUTHOR)
+                    , reviewForecast.getString(DM_CONTENT)
+                    , reviewForecast.getString(DM_URL));
+
+            parsedDataReviews[i] = review;
+        }
+
+        return parsedDataReviews;
     }
 }

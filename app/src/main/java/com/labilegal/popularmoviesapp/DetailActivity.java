@@ -1,47 +1,51 @@
 package com.labilegal.popularmoviesapp;
 
-import android.provider.ContactsContract;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.labilegal.popularmoviesapp.adapter.MoviesWithClassAdapter;
-import com.labilegal.popularmoviesapp.data.Movie;
-import com.labilegal.popularmoviesapp.utilities.NetworkUtils;
-import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class DetailActivity extends AppCompatActivity {
-
-    @BindView(R.id.tv_detail_original_title) TextView mTextViewDetailTitle;
-    @BindView(R.id.iv_detail_movie_img) ImageView mImageViewDetailMovieImg;
-    @BindView(R.id.tv_detail_overview) TextView mTextViewOverview;
-    @BindView(R.id.tv_detail_vote_average) TextView mTextViewVoteAverage;
-    @BindView(R.id.tv_detail_release_date) TextView mTextViewReleaseDate;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Log.v("DetailActivity ", "on est dans le onCreate");
 
-        Movie movie = getIntent().getExtras().getParcelable("movie");
+        if (findViewById(R.id.detail_fragment) != null) {
+            Log.v("DetailActivity ", "on est dans le (findViewById(R.id.detail_fragment) != null) ");
 
-        ButterKnife.bind(this);
+            if (savedInstanceState != null) {
+                return;
+            }
 
-        mTextViewDetailTitle.setText(movie.getOriginalTitle());
-        Picasso.with(this)
-                .load(String.valueOf(NetworkUtils.choseSizeToLoad(movie, this)))
-                .into(mImageViewDetailMovieImg);
-        mTextViewOverview.append(movie.getOverview());
-        mTextViewVoteAverage.append(String.valueOf(movie.getVoteAverage()));
-        mTextViewReleaseDate.append(movie.getReleaseDate());
+            DetailFragment newFragment = new DetailFragment();
+            newFragment.setArguments(getIntent().getExtras());
+            getSupportFragmentManager().beginTransaction().replace(R.id.detail_fragment, newFragment).commit();
+
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.detailmenu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.home:
+                finish();
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }

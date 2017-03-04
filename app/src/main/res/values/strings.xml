@@ -5,12 +5,17 @@
 
     <string name="menu_popular">Popular</string>
     <string name="menu_top_rated">Top rated</string>
+    <string name="menu_favorites">Favorites</string>
 
     <string name="detail_activity_name">Movie details</string>
-    <string name="detail_overview">Overview : \n</string>
     <string name="detail_vote_average">Vote Average : </string>
-    <string name="detail_release_date">Release Date : </string>
 
     <string name="sort_by_most_popular">SortByMostPopular</string>
     <string name="sort_by_top_rated">SortByTopRated</string>
+
+    <string name="trailers">Trailers :</string>
+    <string name="reviews">Reviews :</string>
+    <string name="action_favorite">button favorite</string>
+    <string name="sort_by_favorites">SortByFavorites</string>
+
 </resources>
